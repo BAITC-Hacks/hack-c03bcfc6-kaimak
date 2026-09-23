@@ -1,15 +1,18 @@
 <!doctype html>
-<html lang="ru" data-theme="paper">
+<html lang="ru" data-theme="studio">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f6f5f0"><meta name="description" content="Аким на 5 часов — симулятор управления городом HackAlem AI.">
+<meta name="theme-color" content="#f2effb"><meta name="description" content="Аким на 5 часов — симулятор управления городом HackAlem AI.">
 <title>QALA LAB — Аким на 5 часов</title>
-<script src="/preferences.js?v=1"></script><link rel="stylesheet" href="/style.css?v=5"><link rel="stylesheet" href="/themes.css?v=1"><script src="/app.js?v=5" defer></script>
+<script src="/preferences.js?v=2"></script><link rel="stylesheet" href="/style.css?v=5"><link rel="stylesheet" href="/themes.css?v=2"><script src="/app.js?v=6" defer></script>
 </head><body>
 <header class="site-header shell">
 <a class="brand" href="#top" data-i18n-aria="backTop"><span class="brand-mark">қ</span><span>QALA<span class="mint">.</span>LAB<small><span data-i18n="brandSubtitle">Симулятор управления городом</span></small></span></a>
 <nav data-i18n-aria="navigation"><a href="#workspace"><span data-i18n="navDecisions">Решения</span></a><a href="#atlas"><span data-i18n="navDistricts">Районы</span></a><a href="#teams"><span data-i18n="navScenarios">Сценарии</span></a></nav>
-<div class="preferences"><label for="language-select"><span><span data-i18n="language">Язык</span></span><select id="language-select"><option value="ru">Русский</option><option value="en">English</option><option value="kk">Қазақша</option></select></label><label for="theme-select"><span><span data-i18n="theme">Тема</span></span><select id="theme-select"><option value="paper" data-i18n="paper">Светлая</option><option value="night" data-i18n="night">Тёмная</option><option value="studio" data-i18n="studio">Лаванда</option></select></label></div>
+<div class="preferences">
+<button id="language-toggle" class="preference-button" type="button" aria-label="Сменить язык" title="Сменить язык"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg><span id="language-code" aria-hidden="true">RU</span></button>
+<button id="theme-toggle" class="preference-button" type="button" aria-label="Включить тёмную тему" title="Включить тёмную тему"><svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg></button>
+</div>
 </header>
 <main id="top" class="shell">
 <section class="app-intro"><div><p class="eyebrow"><span data-i18n="introKicker">HACKALEM AI / СИМУЛЯТОР</span></p><h1><span data-i18n="appTitle">Аким на 5 часов</span></h1><p><span data-i18n="intro">Соберите план из пяти мер и сравните его влияние на районы Астаны.</span></p><a class="city-link" href="#atlas"><span data-i18n="openCity">Открыть 3D-город ↓</span></a></div><div class="intro-facts"><span><b>100</b><span data-i18n="budgetFact">бюджет, усл. ед.</span></span><span><b>5</b><span data-i18n="districtsFact">районов</span></span><span><b>8</b><span data-i18n="quartersFact">кварталов</span></span></div></section>

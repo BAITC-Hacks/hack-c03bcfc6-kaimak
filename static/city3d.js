@@ -41,7 +41,6 @@ export function createCity3D(host, {onSelect, onFailure}) {
   let yaw=.2, pitch=.94, zoom=1, width=1, height=1, frame=0, dead=false, visible=true;
   let activeTheme='night', numberLocale='ru-RU', translate=key=>key, lastPresentation=null;
   const sceneThemes={
-    paper:{background:0xe8efea,base:0xc7d6cc,floor:0x9cbcaa,critical:0xd6b38c,border:0x668e78,selected:0x285b46,concrete:0xe6e5da},
     night:{background:0x142329,base:0x263b3f,floor:0x3f6958,critical:0x86684a,border:0x829f91,selected:0xe1efb8,concrete:0xc4ccbc},
     studio:{background:0xeee8f7,base:0xc7bcd7,floor:0xb8a2cf,critical:0xd6af97,border:0x9271ad,selected:0x634180,concrete:0xe6dfee},
   };
@@ -217,7 +216,7 @@ export function createCity3D(host, {onSelect, onFailure}) {
     setAppearance({theme,locale,translate:nextTranslate}) {
       const changed=activeTheme!==theme||numberLocale!==locale||translate!==nextTranslate;
       if(!changed)return;
-      activeTheme=sceneThemes[theme]?theme:'paper';numberLocale=locale;translate=nextTranslate;
+      activeTheme=sceneThemes[theme]?theme:'studio';numberLocale=locale;translate=nextTranslate;
       const colors=sceneThemes[activeTheme];
       renderer.setClearColor(colors.background);baseMaterial.color.setHex(colors.base);concrete.color.setHex(colors.concrete);
       grid.material.vertexColors=false;grid.material.color.setHex(colors.base);grid.material.needsUpdate=true;

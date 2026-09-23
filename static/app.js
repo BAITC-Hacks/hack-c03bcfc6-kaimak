@@ -48,13 +48,27 @@ function translatePage() {
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll('[data-i18n-aria]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
-  $('language-select').value=state.lang;$('theme-select').value=state.theme;
+  updatePreferenceButtons();
   if(city3dStatus){$('city3d-status').textContent=t(city3dStatus);}
   if(booting)$('load-status-text').textContent=t('loading');
 }
+function updatePreferenceButtons() {
+  const labels = {
+    ru:['Сменить язык', 'Включить светлую тему', 'Включить тёмную тему'],
+    en:['Change language', 'Switch to light theme', 'Switch to dark theme'],
+    kk:['Тілді ауыстыру', 'Ашық тақырыпқа ауысу', 'Қараңғы тақырыпқа ауысу'],
+  }[state.lang];
+  $('language-code').textContent={ru:'RU',en:'EN',kk:'KZ'}[state.lang];
+  const languageLabel=`${labels[0]}: ${{ru:'Русский → English',en:'English → Қазақша',kk:'Қазақша → Русский'}[state.lang]}`;
+  const themeLabel=labels[state.theme==='night'?1:2];
+  for(const [id,label] of [['language-toggle',languageLabel],['theme-toggle',themeLabel]]) {
+    $(id).setAttribute('aria-label',label);$(id).title=label;
+  }
+}
 function applyTheme() {
+  updatePreferenceButtons();
   document.documentElement.dataset.theme=state.theme;
-  document.querySelector('meta[name="theme-color"]').content={paper:'#f6f5f0',night:'#101d22',studio:'#f2effb'}[state.theme];
+  document.querySelector('meta[name="theme-color"]').content={night:'#101d22',studio:'#f2effb'}[state.theme];
   if(city3d)city3d.setAppearance({theme:state.theme,locale:locale(),translate:t});
 }
 async function setChoices(candidate,message) {
@@ -143,7 +157,7 @@ async function initCity3D() {
   if(city3d){setMapMode('3d');return;}if(city3dLoading||!state.result)return;
   city3dLoading=true;city3dStatus='loading3d';$('city3d-status').hidden=false;$('city3d-status').textContent=t(city3dStatus);
   try {
-    const {createCity3D}=await import('/city3d.js?v=2');setMapMode('3d');
+    const {createCity3D}=await import('/city3d.js?v=3');setMapMode('3d');
     city3d=createCity3D($('city3d-host'),{onSelect:chooseDistrict,onFailure:city3dFailure});
     city3d.setAppearance({theme:state.theme,locale:locale(),translate:t});city3d.update(state.result,state.view,state.district);
     city3dStatus=null;$('city3d-status').hidden=true;
@@ -241,8 +255,8 @@ async function init() {
   }catch(e){$('load-status').hidden=false;$('load-status-text').textContent=t('loadFailed',{reason:e.message});$('retry-button').hidden=false;$('completion-hint').textContent=t('notLoaded');}
   finally{booting=false;renderButtons();}
 }
-$('language-select').value=state.lang;$('theme-select').value=state.theme;
-$('language-select').onchange=e=>{state.lang=e.target.value;savePreferences();translatePage();if(state.data){renderStatic();render();}};
-$('theme-select').onchange=e=>{state.theme=e.target.value;applyTheme();savePreferences();};
+updatePreferenceButtons();
+$('language-toggle').onclick=()=>{const languages=['ru','en','kk'];state.lang=languages[(languages.indexOf(state.lang)+1)%languages.length];savePreferences();updatePreferenceButtons();translatePage();if(state.data){renderStatic();render();}};
+$('theme-toggle').onclick=()=>{state.theme=state.theme==='night'?'studio':'night';applyTheme();savePreferences();};
 $('retry-button').onclick=init;applyTheme();init();
 })();
