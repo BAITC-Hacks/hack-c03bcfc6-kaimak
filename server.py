@@ -31,12 +31,16 @@ class Handler(BaseHTTPRequestHandler):
             baseline = simulate([])
             self._json(200, {"budget": BUDGET, "categories": CATEGORIES, "districts": DISTRICTS, "actions": ACTIONS, "indicators": INDICATORS, "horizon": HORIZON, "synergies": SYNERGIES, "conflicts": CONFLICTS, "presets": PRESETS, "version": DATASET_VERSION, "baseline": baseline})
             return
-        files = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css"}
+        files = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css", "/city3d.js": "city3d.js",
+                 "/locales.json": "locales.json", "/preferences.js": "preferences.js", "/themes.css": "themes.css",
+                 "/vendor/three.module.js": "vendor/three.module.js",
+                 "/vendor/three.core.js": "vendor/three.core.js",
+                 "/vendor/THREE-LICENSE.txt": "vendor/THREE-LICENSE.txt"}
         if route not in files:
             self.send_error(404)
             return
         path = STATIC / files[route]
-        content_type = {".html": "text/html; charset=utf-8", ".js": "application/javascript; charset=utf-8", ".css": "text/css; charset=utf-8"}[path.suffix]
+        content_type = {".html": "text/html; charset=utf-8", ".js": "application/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".json": "application/json; charset=utf-8"}[path.suffix]
         body = path.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", content_type)
@@ -56,15 +60,18 @@ class Handler(BaseHTTPRequestHandler):
             if length < 1 or length > MAX_BODY:
                 raise ValueError("Неверный размер запроса.")
             request = json.loads(self.rfile.read(length))
-            if not isinstance(request, dict) or set(request) != {"choices"}:
+            if not isinstance(request, dict) or "choices" not in request or set(request) - {"choices", "lang"}:
                 raise ValueError("Ожидается список решений choices.")
+            language = request.get("lang", "ru")
+            if language not in ("ru", "en", "kk"):
+                raise ValueError("Unsupported language.")
             choices = validate_choices(request["choices"], complete=route == "/api/analyze")
             result = simulate(choices, with_recommendation=True)
         except (ValueError, TypeError, json.JSONDecodeError) as error:
-            self._json(400, {"error": str(error)})
+            self._json(400, {"error": str(error), "error_code": getattr(error, "code", "serverError"), "error_params": getattr(error, "params", {})})
             return
         if route == "/api/analyze":
-            result["providers"] = analyze_with_providers(choices, result)
+            result["providers"] = analyze_with_providers(choices, result, language)
         self._json(200, result)
 
 

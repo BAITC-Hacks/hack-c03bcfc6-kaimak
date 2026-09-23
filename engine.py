@@ -8,38 +8,46 @@ DISTRICT_BY_ID = {item['id']: item for item in DISTRICTS}
 WEIGHTS = {item['id']: item['weight'] for item in INDICATORS}
 
 
+class ChoiceError(ValueError):
+    """Machine-readable validation code plus the original Russian API message."""
+    def __init__(self, code, message, **params):
+        super().__init__(message)
+        self.code = code
+        self.params = params
+
+
 def validate_choices(raw, complete=False):
     if not isinstance(raw, list):
-        raise ValueError('Решения должны быть списком мероприятий.')
+        raise ChoiceError('err_list', 'Решения должны быть списком мероприятий.')
     if len(raw) > 5 or (complete and len(raw) != 5):
-        raise ValueError('Для итогового Score нужно ровно 5 решений.')
+        raise ChoiceError('err_count', 'Для итогового Score нужно ровно 5 решений.')
     choices, seen, counts = [], set(), Counter()
     for choice in raw:
         if not isinstance(choice, dict) or not isinstance(choice.get('action'), str):
-            raise ValueError('Укажите ID мероприятия.')
+            raise ChoiceError('err_action', 'Укажите ID мероприятия.')
         action = ACTION_BY_ID.get(choice['action'])
         if action is None:
-            raise ValueError('Неизвестное мероприятие.')
+            raise ChoiceError('err_action', 'Неизвестное мероприятие.')
         if action['id'] in seen:
-            raise ValueError(f"{action['id']}: повторы мероприятий запрещены.")
+            raise ChoiceError('err_duplicate', f"{action['id']}: повторы мероприятий запрещены.", action=action['id'])
         seen.add(action['id'])
         expected = {'action', 'district'} if action['scope'] == 'district' else {'action'}
         if set(choice) != expected:
-            raise ValueError('Для районной меры нужен район; для городской район не указывается.')
+            raise ChoiceError('err_scope', 'Для районной меры нужен район; для городской район не указывается.')
         if action['scope'] == 'district' and (not isinstance(choice['district'], str) or choice['district'] not in DISTRICT_BY_ID):
-            raise ValueError('Неизвестный район.')
+            raise ChoiceError('err_district', 'Неизвестный район.')
         counts[action['category']] += 1
         if counts[action['category']] > 2:
-            raise ValueError('Разрешено не более 2 мер из одного направления.')
+            raise ChoiceError('err_category', 'Разрешено не более 2 мер из одного направления.')
         choices.append(dict(choice))
     by_id = {c['action']: c for c in choices}
     for conflict in CONFLICTS:
         a, b = conflict['pair']
         if a in by_id and b in by_id and (conflict['scope'] == 'any' or by_id[a]['district'] == by_id[b]['district']):
-            raise ValueError(conflict['reason'])
+            raise ChoiceError('err_' + '_'.join(conflict['pair']), conflict['reason'])
     spent = sum(ACTION_BY_ID[c['action']]['cost'] for c in choices)
     if spent > BUDGET:
-        raise ValueError(f'Бюджет превышен на {spent - BUDGET} усл. ед.')
+        raise ChoiceError('err_budget', f'Бюджет превышен на {spent - BUDGET} усл. ед.', amount=spent-BUDGET)
     # Canonical order keeps output independent of the order of selection.
     return sorted(choices, key=lambda c: int(c['action'][1:]))
 
@@ -145,6 +153,6 @@ def recommend(choices, current):
                 if improvement > 0 and (best is None or (result['score'], result['remaining']) > (best['score'], best['remaining'])):
                     location = DISTRICT_BY_ID[target]['name'] if target else 'весь город'
                     best = {'choices': result['choices'], 'score': result['score'], 'improvement': improvement,
-                            'remaining': result['remaining'],
+                            'remaining': result['remaining'], 'old_action': old['action'], 'replacement': replacement,
                             'text': f"Замените {old['action']} на {action['id']} «{action['name']}» ({location}). Score {result['score']:.2f} ({improvement:+.2f}), остаток {result['remaining']} усл. ед."}
     return best
