@@ -6,6 +6,7 @@ const state = {data:null, choices:[], active:'transport', target:'nura', distric
 const storageKey = 'qala-hackalem-v2';
 const locale = () => ({ru:'ru-RU',en:'en-GB',kk:'kk-KZ'}[state.lang]);
 let translations = {};
+let openaiKey = ''; // Memory only: never persist credentials with preferences or scenarios.
 const initialMessages = {
   ru:{loading:'Загружаем каталог…',networkError:'Нет связи с сервером. Проверьте, запущен ли server.py.',serverError:'Не удалось обработать запрос.',loadFailed:'Не удалось загрузить симулятор. {reason}',notLoaded:'Каталог не загружен. Нажмите «Повторить загрузку».'},
   en:{loading:'Loading catalogue…',networkError:'Cannot reach the server. Make sure server.py is running.',serverError:'The request could not be processed.',loadFailed:'Could not load the simulator. {reason}',notLoaded:'Catalogue unavailable. Try loading again.'},
@@ -222,7 +223,7 @@ function bindControls() {
     if(!state.result.complete||state.analyzing||state.changing||booting)return;
     const snapshot=JSON.stringify(state.choices),lang=state.lang;state.analyzing=true;renderButtons();$('result-section').scrollIntoView({behavior:'smooth'});
     try {
-      const r=await api('/api/analyze',{choices:JSON.parse(snapshot),lang});
+      const r=await api('/api/analyze',{choices:JSON.parse(snapshot),lang,...(openaiKey ? {openai_api_key:openaiKey} : {})});
       if(snapshot!==JSON.stringify(state.choices)){toast(t('planChanged'));return;}
       state.providers[lang]=r.providers;renderProviders();toast(t('aiFinished'));
     }catch(e){toast(e.message,true);}finally{state.analyzing=false;renderButtons();}
@@ -255,6 +256,35 @@ async function init() {
   }catch(e){$('load-status').hidden=false;$('load-status-text').textContent=t('loadFailed',{reason:e.message});$('retry-button').hidden=false;$('completion-hint').textContent=t('notLoaded');}
   finally{booting=false;renderButtons();}
 }
+function settingsStatus() {
+  $('settings-status').textContent=t(openaiKey?'settingsConfigured':'settingsEmpty');
+}
+$('settings-toggle').onclick=()=>{
+  $('openai-key').value='';
+  settingsStatus();
+  $('settings-dialog').showModal();
+  $('openai-key').focus();
+};
+$('settings-close').onclick=()=>$('settings-dialog').close();
+$('settings-dialog').addEventListener('close',()=>{ $('openai-key').value=''; });
+$('settings-dialog').addEventListener('click',event=>{
+  const rect=$('settings-dialog').getBoundingClientRect();
+  if(event.target===$('settings-dialog') && (event.clientX<rect.left || event.clientX>rect.right || event.clientY<rect.top || event.clientY>rect.bottom))$('settings-dialog').close();
+});
+$('settings-form').onsubmit=event=>{
+  event.preventDefault();
+  const key=$('openai-key').value.trim();
+  if(!/^sk-[A-Za-z0-9_-]+$/.test(key)){
+    $('settings-status').textContent=t('settingsInvalid');
+    $('openai-key').focus();return;
+  }
+  openaiKey=key;
+  $('settings-dialog').close();
+  toast(t('settingsSaved'));
+};
+$('settings-remove').onclick=()=>{
+  openaiKey='';$('openai-key').value='';settingsStatus();
+};
 updatePreferenceButtons();
 $('language-toggle').onclick=()=>{const languages=['ru','en','kk'];state.lang=languages[(languages.indexOf(state.lang)+1)%languages.length];savePreferences();updatePreferenceButtons();translatePage();if(state.data){renderStatic();render();}};
 $('theme-toggle').onclick=()=>{state.theme=state.theme==='night'?'studio':'night';applyTheme();savePreferences();};

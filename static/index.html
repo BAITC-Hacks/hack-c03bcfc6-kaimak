@@ -4,16 +4,27 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f2effb"><meta name="description" content="Аким на 5 часов — симулятор управления городом HackAlem AI.">
 <title>QALA LAB — Аким на 5 часов</title>
-<script src="/preferences.js?v=2"></script><link rel="stylesheet" href="/style.css?v=5"><link rel="stylesheet" href="/themes.css?v=2"><script src="/app.js?v=6" defer></script>
+<script src="/preferences.js?v=2"></script><link rel="stylesheet" href="/style.css?v=5"><link rel="stylesheet" href="/themes.css?v=3"><script src="/app.js?v=7" defer></script>
 </head><body>
 <header class="site-header shell">
 <a class="brand" href="#top" data-i18n-aria="backTop"><span class="brand-mark">қ</span><span>QALA<span class="mint">.</span>LAB<small><span data-i18n="brandSubtitle">Симулятор управления городом</span></small></span></a>
 <nav data-i18n-aria="navigation"><a href="#workspace"><span data-i18n="navDecisions">Решения</span></a><a href="#atlas"><span data-i18n="navDistricts">Районы</span></a><a href="#teams"><span data-i18n="navScenarios">Сценарии</span></a></nav>
 <div class="preferences">
 <button id="language-toggle" class="preference-button" type="button" aria-label="Сменить язык" title="Сменить язык"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg><span id="language-code" aria-hidden="true">RU</span></button>
+<button id="settings-toggle" class="preference-button" type="button" aria-haspopup="dialog" aria-controls="settings-dialog" data-i18n-aria="settings" aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg></button>
 <button id="theme-toggle" class="preference-button" type="button" aria-label="Включить тёмную тему" title="Включить тёмную тему"><svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg></button>
 </div>
 </header>
+<dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title" aria-describedby="settings-hint">
+<form id="settings-form">
+<div class="settings-heading"><h2 id="settings-title" data-i18n="settings">Настройки</h2><button id="settings-close" class="preference-button" type="button" data-i18n-aria="settingsClose" aria-label="Закрыть">×</button></div>
+<label for="openai-key">OpenAI API key</label>
+<input id="openai-key" type="password" placeholder="sk-…" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="512" aria-describedby="settings-hint settings-status">
+<p id="settings-hint" class="micro" data-i18n="settingsHint">Ключ действует до перезагрузки страницы. Он передаётся серверу сайта только для AI-разбора. Используйте только доверенный сайт.</p>
+<p id="settings-status" class="micro" role="status"></p>
+<div class="settings-actions"><button id="settings-remove" class="button outline" type="button" data-i18n="settingsRemove">Удалить ключ</button><button class="button primary" type="submit" data-i18n="settingsSave">Сохранить</button></div>
+</form>
+</dialog>
 <main id="top" class="shell">
 <section class="app-intro"><div><p class="eyebrow"><span data-i18n="introKicker">HACKALEM AI / СИМУЛЯТОР</span></p><h1><span data-i18n="appTitle">Аким на 5 часов</span></h1><p><span data-i18n="intro">Соберите план из пяти мер и сравните его влияние на районы Астаны.</span></p><a class="city-link" href="#atlas"><span data-i18n="openCity">Открыть 3D-город ↓</span></a></div><div class="intro-facts"><span><b>100</b><span data-i18n="budgetFact">бюджет, усл. ед.</span></span><span><b>5</b><span data-i18n="districtsFact">районов</span></span><span><b>8</b><span data-i18n="quartersFact">кварталов</span></span></div></section>
 <section id="workspace" class="section">

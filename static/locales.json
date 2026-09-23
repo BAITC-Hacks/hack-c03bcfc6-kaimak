@@ -244,7 +244,16 @@
     "preset_connections": "Транспортные связи",
     "desc_source": "Нура, чистый воздух и цифровой сервис. Точный набор из датасета.",
     "desc_reserve": "Недорогой набор из датасета. Районы выбраны для этого примера.",
-    "desc_connections": "Автобусные полосы и умные светофоры с бонусом синергии."
+    "desc_connections": "Автобусные полосы и умные светофоры с бонусом синергии.",
+    "settings": "Настройки",
+    "settingsClose": "Закрыть",
+    "settingsHint": "Ключ действует до перезагрузки страницы. Он передаётся серверу сайта только для AI-разбора. Используйте только доверенный сайт.",
+    "settingsRemove": "Удалить ключ",
+    "settingsSave": "Сохранить",
+    "settingsConfigured": "Ключ задан для этой страницы. Проверка подключения выполняется при AI-разборе.",
+    "settingsEmpty": "Ключ не задан. Будет использован ключ сервера, если он настроен.",
+    "settingsInvalid": "Вставьте корректный API key, начинающийся с sk-.",
+    "settingsSaved": "Ключ сохранён до перезагрузки страницы."
   },
   "en": {
     "appTitle": "Mayor for 5 hours",
@@ -491,7 +500,16 @@
     "preset_connections": "Transport connections",
     "desc_source": "Nura, cleaner air and digital services. The exact dataset example.",
     "desc_reserve": "A low-cost dataset combination. Districts chosen for this example.",
-    "desc_connections": "Bus lanes and adaptive traffic lights with a synergy bonus."
+    "desc_connections": "Bus lanes and adaptive traffic lights with a synergy bonus.",
+    "settings": "Settings",
+    "settingsClose": "Close",
+    "settingsHint": "The key lasts until you reload this page. It is sent to this site’s server only for AI analysis. Use only a trusted site.",
+    "settingsRemove": "Remove key",
+    "settingsSave": "Save",
+    "settingsConfigured": "A key is set for this page. The connection is checked when you run AI analysis.",
+    "settingsEmpty": "No key set. The server key will be used if configured.",
+    "settingsInvalid": "Enter a valid API key starting with sk-.",
+    "settingsSaved": "Key saved until you reload the page."
   },
   "kk": {
     "appTitle": "5 сағатқа әкім",
@@ -738,6 +756,15 @@
     "preset_connections": "Көлік байланыстары",
     "desc_source": "Нұра, таза ауа және цифрлық қызмет. Деректер жиынындағы нақты мысал.",
     "desc_reserve": "Деректер жиынындағы арзан шаралар. Аудандар осы мысал үшін таңдалған.",
-    "desc_connections": "Автобус жолақтары мен ақылды бағдаршамдар, синергия бонусымен."
+    "desc_connections": "Автобус жолақтары мен ақылды бағдаршамдар, синергия бонусымен.",
+    "settings": "Баптаулар",
+    "settingsClose": "Жабу",
+    "settingsHint": "Кілт бет қайта жүктелгенге дейін қолданылады. Ол сайт серверіне тек AI талдауы үшін жіберіледі. Тек сенімді сайтты пайдаланыңыз.",
+    "settingsRemove": "Кілтті жою",
+    "settingsSave": "Сақтау",
+    "settingsConfigured": "Осы бет үшін кілт орнатылды. Байланыс AI талдауы кезінде тексеріледі.",
+    "settingsEmpty": "Кілт орнатылмаған. Сервер кілті бапталған болса, сол қолданылады.",
+    "settingsInvalid": "sk- таңбаларынан басталатын жарамды API кілтін енгізіңіз.",
+    "settingsSaved": "Кілт бет қайта жүктелгенге дейін сақталды."
   }
 }

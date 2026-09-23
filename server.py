@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -60,8 +61,11 @@ class Handler(BaseHTTPRequestHandler):
             if length < 1 or length > MAX_BODY:
                 raise ValueError("Неверный размер запроса.")
             request = json.loads(self.rfile.read(length))
-            if not isinstance(request, dict) or "choices" not in request or set(request) - {"choices", "lang"}:
+            if not isinstance(request, dict) or "choices" not in request or set(request) - ({"choices", "lang", "openai_api_key"} if route == "/api/analyze" else {"choices", "lang"}):
                 raise ValueError("Ожидается список решений choices.")
+            openai_key = request.get("openai_api_key")
+            if openai_key is not None and (not isinstance(openai_key, str) or len(openai_key) > 512 or not re.fullmatch(r"sk-[A-Za-z0-9_-]+", openai_key)):
+                raise ValueError("Invalid OpenAI API key format.")
             language = request.get("lang", "ru")
             if language not in ("ru", "en", "kk"):
                 raise ValueError("Unsupported language.")
@@ -71,7 +75,7 @@ class Handler(BaseHTTPRequestHandler):
             self._json(400, {"error": str(error), "error_code": getattr(error, "code", "serverError"), "error_params": getattr(error, "params", {})})
             return
         if route == "/api/analyze":
-            result["providers"] = analyze_with_providers(choices, result, language)
+            result["providers"] = analyze_with_providers(choices, result, language, openai_key=openai_key)
         self._json(200, result)
 
 

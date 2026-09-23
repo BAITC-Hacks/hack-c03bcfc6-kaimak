@@ -17,3 +17,14 @@ body{font-size:17px;line-height:1.65;background:var(--page-bg);color:var(--text)
 html[data-theme="night"] .theme-moon{display:none}
 html[data-theme="night"] .theme-sun{display:block}
 @media(max-width:420px){.site-header{display:flex;gap:12px}.site-header .brand{gap:8px;font-size:21px}.site-header .brand small{max-width:150px;font-size:8px}.preferences{gap:6px}.preference-button{padding:8px}#language-code{display:none}}
+
+/* API settings use the current theme and the native modal focus trap. */
+.settings-dialog{width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow:auto;margin:auto;padding:28px;border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--text);box-shadow:0 24px 80px #0004}
+.settings-dialog::backdrop{background:#101d2280;backdrop-filter:blur(4px)}
+.settings-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.settings-heading h2{margin:0;font-size:26px}
+.settings-dialog label{display:block;margin-bottom:10px;font-weight:600}
+.settings-dialog input{box-sizing:border-box;width:100%;min-width:0;font-size:16px}
+.settings-dialog .micro{line-height:1.6;margin:14px 0;color:var(--muted)}
+.settings-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:24px}
+@media(max-width:380px){.site-header{flex-wrap:wrap}.settings-dialog{padding:20px}}

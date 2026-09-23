@@ -1,6 +1,6 @@
 """Grounded, optional two-provider analysis for synthetic scenarios.
 
-API keys never leave the server and never appear in responses or logs.
+API keys are sent only to their provider and never appear in responses or logs.
 """
 
 import json
@@ -119,8 +119,8 @@ def _nvidia_review(facts, language="ru"):
         return _provider_failure(error)
 
 
-def _openai_explanation(facts, review, language="ru"):
-    key = os.environ.get("OPENAI_API_KEY")
+def _openai_explanation(facts, review, language="ru", api_key=None):
+    key = api_key or os.environ.get("OPENAI_API_KEY")
     if not key:
         return {"status": "unconfigured", "text": None}
     prompt = {"verified_scenario": facts, "independent_review_hypothesis": review}
@@ -140,10 +140,10 @@ def _openai_explanation(facts, review, language="ru"):
         return _provider_failure(error)
 
 
-def analyze_with_providers(choices, result, language="ru"):
+def analyze_with_providers(choices, result, language="ru", openai_key=None):
     facts = _facts(choices, result)
     nvidia = _nvidia_review(facts, language)
-    openai = _openai_explanation(facts, nvidia["text"], language)
+    openai = _openai_explanation(facts, nvidia["text"], language, api_key=openai_key)
     return {"nvidia": nvidia, "openai": openai}
 
 
