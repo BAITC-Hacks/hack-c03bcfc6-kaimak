@@ -7,6 +7,7 @@
   <meta name="description" content="Аким на 5 часов — симулятор решений для города с общим бюджетом и прозрачным Astana Quality of Life Score.">
   <title>Аким на 5 часов · Astana City Lab</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/i18n.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body>
@@ -20,6 +21,7 @@
       <a href="#workspace">Симулятор</a><a href="#districts-section">Районы</a><a href="#teams-section">Команды</a>
     </nav>
     <span class="header-badge"><span class="live-dot"></span> HACKALEM AI / TASK 01</span>
+    <button id="language-button" class="language-button" type="button" aria-label="Change language">EN</button>
   </header>
 
   <main id="top" class="shell">
@@ -40,7 +42,7 @@
 
     <section class="brief-strip" aria-label="Условия симуляции">
       <div><span class="brief-icon">₸</span><p>ВИРТУАЛЬНЫЙ БЮДЖЕТ<strong id="brief-budget">1 000 млн ₸</strong></p></div>
-      <div><span class="brief-icon">▦</span><p>УСЛОВНЫХ РАЙОНА<strong>4 района</strong></p></div>
+      <div><span class="brief-icon">▦</span><p>РАЙОНОВ ИЗ PDF<strong>5 районов</strong></p></div>
       <div><span class="brief-icon">✳</span><p>НАПРАВЛЕНИЙ<strong>5 решений</strong></p></div>
       <div><span class="brief-icon">◎</span><p>ЦЕЛЬ<strong>Выше качество жизни</strong></p></div>
     </section>
@@ -78,7 +80,7 @@
       <div class="save-strip panel"><div><span class="panel-overline">СРАВНИТЬ С КОМАНДАМИ</span><h3>Сохраните сценарий</h3><p>Результаты хранятся в этом браузере.</p></div><div class="save-controls"><label class="visually-hidden" for="team-name">Название команды</label><input id="team-name" type="text" maxlength="40" placeholder="Название команды"><button id="save-team" class="secondary-button" type="button">Сохранить результат</button></div></div>
     </section>
 
-    <section id="districts-section" class="district-section"><div class="section-heading"><div><span class="section-kicker">03 / КАРТА ДАННЫХ</span><h2>Районы города</h2><p>Показатели условные. Выберите район, чтобы увидеть его профиль.</p></div><span class="outline-tag">СИНТЕТИЧЕСКИЙ ДАТАСЕТ</span></div><div class="district-grid"><div class="district-map panel"><div class="map-header"><span class="panel-overline">ИНТЕРАКТИВНАЯ СХЕМА</span><span>↑ N</span></div><div id="map-tiles" class="map-tiles"></div><p>Схематичная карта, не соответствует реальной географии Астаны.</p></div><div class="district-detail panel" id="district-detail"></div></div></section>
+    <section id="districts-section" class="district-section"><div class="section-heading"><div><span class="section-kicker">03 / КАРТА ДАННЫХ</span><h2>Районы города</h2><p>Показатели из «Датасет районов.pdf». Выберите район, чтобы увидеть его профиль.</p></div><span class="outline-tag">ДАННЫЕ ИЗ PDF</span></div><p class="dataset-note">Данные районов — из PDF. Бюджет, мероприятия и формула результата — учебная модель этого симулятора.</p><div class="district-grid"><div class="district-map panel"><div class="map-header"><span class="panel-overline">ИНТЕРАКТИВНАЯ СХЕМА</span><span>↑ N</span></div><div id="map-tiles" class="map-tiles"></div><p>Схематичная карта, не соответствует реальной географии Астаны.</p></div><div class="district-detail panel" id="district-detail"></div></div></section>
 
     <section id="teams-section" class="teams-section"><div class="section-heading"><div><span class="section-kicker">04 / СРАВНЕНИЕ</span><h2>Сценарии команд</h2><p>Сохранённые результаты доступны только в этом браузере.</p></div><span id="teams-count" class="section-counter">0 СЦЕНАРИЕВ</span></div><div id="teams-list" class="teams-list"></div></section>
   </main>

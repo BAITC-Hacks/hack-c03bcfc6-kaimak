@@ -3,22 +3,24 @@ const state = {
   data: null,
   choices: {},
   active: 'transport',
-  district: 'north',
+  district: 'yesil',
   preview: null,
   analysis: null,
   previewRequest: 0,
   busy: false,
   teams: [],
+  language: ['ru', 'en', 'kk'].includes(localStorage.getItem('qala-language')) ? localStorage.getItem('qala-language') : 'ru',
 };
 
-const format = (value) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 }).format(value);
+const format = (value) => new Intl.NumberFormat({ru:'ru-RU', en:'en-US', kk:'kk-KZ'}[state.language], { maximumFractionDigits: 1 }).format(value);
 const actionById = (id) => state.data.actions.find((item) => item.id === id);
 const districtById = (id) => state.data.districts.find((item) => item.id === id);
 const categoryById = (id) => state.data.categories.find((item) => item.id === id);
+const localized = (item) => item?.[`name_${state.language}`] || item?.name || '';
 
 function toast(message, error = false) {
   const box = $('#toast');
-  box.textContent = message;
+  box.textContent = t(message);
   box.classList.toggle('error', error);
   box.classList.add('show');
   clearTimeout(toast.timer);
@@ -29,7 +31,7 @@ async function api(route, payload) {
   const response = await fetch(route, {
     method: payload ? 'POST' : 'GET',
     headers: payload ? { 'Content-Type': 'application/json' } : {},
-    body: payload ? JSON.stringify(payload) : undefined,
+    body: payload ? JSON.stringify({...payload, language: state.language}) : undefined,
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
@@ -99,7 +101,7 @@ function renderDecision() {
     <div class="decision-head"><div class="decision-heading"><span class="category-icon">${category.icon}</span><div><span class="step-label">РЕШЕНИЕ 0${index + 1} / 05</span><h3>${category.name}</h3></div></div><span class="current-badge">${choice ? '✓ ВЫБРАНО' : 'ОЖИДАЕТ ВЫБОРА'}</span></div>
     <p class="decision-intro">Выберите одно мероприятие. Стоимость списывается из общего бюджета команды.</p>
     <div class="action-list">${actions.map((action) => `<button type="button" class="action-card ${choice?.action === action.id ? 'selected' : ''}" data-action="${action.id}" aria-pressed="${choice?.action === action.id}"><span class="action-radio"></span><span class="action-copy"><strong>${action.name}</strong><small>${action.description}</small><span class="action-tag">${action.tag}</span></span><span class="action-price">${format(action.cost)}<small>млн ₸</small></span></button>`).join('')}</div>
-    <div class="district-picker"><div class="picker-title"><span>Где реализовать?</span><small>${choice ? 'Выберите целевой район' : 'Сначала выберите мероприятие'}</small></div><div class="district-options">${state.data.districts.map((district) => `<button type="button" class="district-chip ${choice?.district === district.id ? 'active' : ''}" data-target="${district.id}" ${choice ? '' : 'disabled'}>${district.name}</button>`).join('')}</div></div>
+    <div class="district-picker"><div class="picker-title"><span>${({ru:'Где реализовать?',en:'Where should it be implemented?',kk:'Қай ауданда іске асырылады?'})[state.language]}</span><small>${choice ? ({ru:'Выберите целевой район',en:'Choose a target district',kk:'Мақсатты ауданды таңдаңыз'})[state.language] : ({ru:'Сначала выберите мероприятие',en:'Choose an action first',kk:'Алдымен шараны таңдаңыз'})[state.language]}</small></div><div class="district-options">${state.data.districts.map((district) => `<button type="button" class="district-chip ${choice?.district === district.id ? 'active' : ''}" data-target="${district.id}" ${choice ? '' : 'disabled'}>${localized(district)}</button>`).join('')}</div></div>
     <div class="decision-foot"><span>Прямой эффект в выбранном районе, часть эффекта — в остальных.</span><button type="button" class="next-button" data-next="true">${index === 4 ? 'К результату' : 'Следующее направление'} →</button></div>`;
 }
 
@@ -132,11 +134,11 @@ function renderDistricts() {
   const result = state.preview || state.data.baseline;
   $('#map-tiles').innerHTML = state.data.districts.map((district) => {
     const score = result.districts.find((item) => item.id === district.id);
-    return `<button type="button" class="map-tile ${state.district === district.id ? 'active' : ''}" data-map="${district.id}" aria-label="Район ${district.name}, показатель ${format(score.after)}"><strong>${format(score.after)}</strong><small>${district.name}</small></button>`;
+    return `<button type="button" class="map-tile ${state.district === district.id ? 'active' : ''}" data-map="${district.id}" aria-label="${localized(district)}"><strong>${format(score.after)}</strong><small>${localized(district)}</small></button>`;
   }).join('');
   const district = districtById(state.district);
   const score = result.districts.find((item) => item.id === district.id);
-  $('#district-detail').innerHTML = `<span class="panel-overline">ПРОФИЛЬ РАЙОНА</span><h3>${district.name}<span class="district-delta">${score.delta ? `+${format(score.delta)}` : ''}</span></h3><p>${district.note}</p><div class="district-stats"><div>НАСЕЛЕНИЕ<strong>${format(district.population / 1000)} тыс.</strong></div><div>ИНДЕКС РАЙОНА<strong>${format(score.after)} / 100</strong></div></div><div class="district-score-list">${state.data.categories.map((category) => `<div class="district-score-line"><span>${category.short}</span><span class="district-mini-track"><span style="width:${score.scores[category.id]}%"></span></span><b>${format(score.scores[category.id])}</b></div>`).join('')}</div>`;
+  $('#district-detail').innerHTML = `<span class="panel-overline">${({ru:'ПРОФИЛЬ РАЙОНА',en:'DISTRICT PROFILE',kk:'АУДАН ПРОФИЛІ'})[state.language]}</span><h3>${localized(district)}<span class="district-delta">${score.delta ? `+${format(score.delta)}` : ''}</span></h3><p>${district[`note_${state.language}`] || district.note}</p><div class="district-stats"><div>ДОЛЯ НАСЕЛЕНИЯ<strong>${format(district.population_share * 100)}%</strong></div><div>${({ru:'ИНДЕКС РАЙОНА',en:'DISTRICT INDEX',kk:'АУДАН ИНДЕКСІ'})[state.language]}<strong>${format(score.after)} / 100</strong></div></div><div class="district-score-list">${state.data.categories.map((category) => `<div class="district-score-line"><span>${category.short}</span><span class="district-mini-track"><span style="width:${score.scores[category.id]}%"></span></span><b>${format(score.scores[category.id])}</b></div>`).join('')}</div><div class="pdf-indicators"><b>${({ru:'Исходные показатели из датасета PDF',en:'Source indicators from the PDF dataset',kk:'PDF деректер жиынындағы бастапқы көрсеткіштер'})[state.language]}</b><span>${Object.entries(district.indicators).map(([key,value]) => `<span class="indicator-row" data-localized><span>${key} · ${indicatorLabel(key)}</span><strong>${value}</strong></span>`).join('')}</span></div>`;
 }
 
 function listInto(selector, items) {
@@ -160,9 +162,9 @@ function renderAnalysis() {
   const nvidia = result.providers?.nvidia || { status: 'unconfigured', text: null };
   const active = [openai.status === 'ok' && 'OpenAI', nvidia.status === 'ok' && 'NVIDIA'].filter(Boolean);
   $('#analysis-mode').textContent = active.length ? `Локальный агент + ${active.join(' + ')}` : 'Локальный аналитический агент';
-  $('#openai-block').hidden = !openai.text;
+  $('#openai-block').hidden = !openai.text || result.language !== state.language;
   $('#llm-narrative').textContent = openai.text || '';
-  $('#nvidia-block').hidden = !nvidia.text;
+  $('#nvidia-block').hidden = !nvidia.text || result.language !== state.language;
   $('#nvidia-review').textContent = nvidia.text || '';
   const failureText = {
     auth_error: 'отклонил авторизацию (401). Проверьте ключ и доступ к API в аккаунте провайдера.',
@@ -179,7 +181,7 @@ function renderAnalysis() {
   $('#provider-status').textContent = failures.length ? `${failures.join(' ')} Локальный анализ остаётся доступен.` : '';
   $('#recommend-text').textContent = result.recommendation?.text || 'Среди всех допустимых замен одного решения агент не нашёл варианта с более высоким Score. Попробуйте изменить сразу несколько решений.';
   $('#apply-recommendation').hidden = !result.recommendation;
-  $('#result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  localizeAnalysis(result);
 }
 
 function loadTeams() {
@@ -214,14 +216,14 @@ function renderTeams() {
     const gain = document.createElement('span'); gain.textContent = `↗ +${format(team.gain)} к базе`;
     const spent = document.createElement('b'); spent.textContent = `${format(team.spent)} млн ₸`;
     bottom.append(gain, spent); card.append(top, name, score, bottom);
-    if (team.choices) {
+    if (team.choices && Object.entries(team.choices).every(([category, choice]) => categoryById(category) && actionById(choice.action)?.category === category && districtById(choice.district))) {
       const load = document.createElement('button'); load.className = 'team-load'; load.type = 'button'; load.textContent = 'Открыть сценарий →';
       load.addEventListener('click', () => {
         state.choices = structuredClone(team.choices);
         state.active = 'transport';
         refreshScenario();
         $('#workspace').scrollIntoView({ behavior: 'smooth' });
-        toast(`Сценарий «${team.name}» загружен.`);
+        toast(({ru:'Сценарий загружен.',en:'Scenario loaded.',kk:'Сценарий жүктелді.'})[state.language]);
       });
       card.append(load);
     }
@@ -234,32 +236,42 @@ async function analyze() {
   state.busy = true;
   renderScore();
   const snapshot = JSON.stringify(state.choices);
+  const language = state.language;
   try {
     const result = await api('/api/analyze', { choices: state.choices });
     if (snapshot !== JSON.stringify(state.choices)) return;
+    result.language = language;
     state.analysis = result;
     state.preview = result;
     renderScore(); renderDistricts(); renderAnalysis();
+    $('#result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (error) { toast(error.message, true); }
   finally { state.busy = false; renderScore(); }
 }
 
 function loadExample() {
   state.choices = {
-    transport: { action: 'bus', district: 'east' },
-    green: { action: 'park', district: 'north' },
-    social: { action: 'hubs', district: 'south' },
-    safety: { action: 'lighting', district: 'east' },
-    service: { action: 'onewindow', district: 'south' },
+    transport: { action: 'bus', district: 'nura' },
+    green: { action: 'park', district: 'yesil' },
+    social: { action: 'hubs', district: 'almaty' },
+    safety: { action: 'lighting', district: 'saryarka' },
+    service: { action: 'onewindow', district: 'baykonyr' },
   };
   state.active = 'transport';
-  state.district = 'east';
+  state.district = 'saryarka';
   refreshScenario();
   $('#workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
   toast('Пример сценария загружен. Все решения можно изменить.');
 }
 
 function wireEvents() {
+  $('#language-button').addEventListener('click', () => {
+    state.language = ({ru:'en', en:'kk', kk:'ru'})[state.language];
+    localStorage.setItem('qala-language', state.language);
+    document.documentElement.lang = state.language;
+    $('#language-button').textContent = ({ru:'EN', en:'ҚАЗ', kk:'RU'})[state.language];
+    renderNavigation(); renderDecision(); renderBudget(); renderScore(); renderDistricts(); renderTeams(); renderAnalysis(); translatePage();
+  });
   $('#category-nav').addEventListener('click', (event) => {
     const button = event.target.closest('[data-category]');
     if (!button) return;
@@ -283,7 +295,7 @@ function wireEvents() {
   $('#reset-button').addEventListener('click', () => {
     state.choices = {};
     state.active = 'transport';
-    state.district = 'north';
+    state.district = 'yesil';
     refreshScenario();
     toast('Сценарий сброшен к исходным условиям.');
   });
@@ -316,11 +328,17 @@ async function start() {
     state.data = await api('/api/bootstrap');
     state.preview = state.data.baseline;
     $('#brief-budget').textContent = `${format(state.data.budget)} млн ₸`;
-    loadTeams(); wireEvents(); renderNavigation(); renderDecision(); renderBudget(); renderScore(); renderDistricts(); renderTeams();
+    loadTeams(); wireEvents(); document.documentElement.lang = state.language; $('#language-button').textContent = ({ru:'EN', en:'ҚАЗ', kk:'RU'})[state.language]; renderNavigation(); renderDecision(); renderBudget(); renderScore(); renderDistricts(); renderTeams();
   } catch (error) {
     toast(`Не удалось загрузить симулятор: ${error.message}`, true);
     $('#decision-content').textContent = 'Не удалось загрузить данные. Обновите страницу или перезапустите сервер.';
   }
 }
 
+// Every render translates new copy immediately; static nodes retain their source text.
+for (const name of ['renderNavigation', 'renderDecision', 'renderBudget', 'renderScore', 'renderDistricts', 'renderTeams', 'renderAnalysis']) {
+  const render = window[name];
+  window[name] = (...args) => { render(...args); translatePage(); };
+}
+translatePage();
 start();

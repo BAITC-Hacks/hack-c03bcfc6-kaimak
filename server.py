@@ -31,7 +31,7 @@ class Handler(BaseHTTPRequestHandler):
             baseline = simulate({})
             self._json(200, {"budget": BUDGET, "categories": CATEGORIES, "districts": DISTRICTS, "actions": ACTIONS, "baseline": baseline})
             return
-        files = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css"}
+        files = {"/": "index.html", "/app.js": "app.js", "/i18n.js": "i18n.js", "/style.css": "style.css"}
         if route not in files:
             self.send_error(404)
             return
@@ -55,15 +55,18 @@ class Handler(BaseHTTPRequestHandler):
             if length < 1 or length > MAX_BODY:
                 raise ValueError("Неверный размер запроса.")
             request = json.loads(self.rfile.read(length))
-            if not isinstance(request, dict) or set(request) != {"choices"}:
+            if not isinstance(request, dict) or set(request) - {"choices", "language"} or "choices" not in request:
                 raise ValueError("Ожидаются только решения сценария.")
+            language = request.get("language", "ru")
+            if language not in ("ru", "en", "kk"):
+                raise ValueError("Unsupported language")
             choices = validate_choices(request["choices"], complete=route == "/api/analyze")
             result = simulate(choices, with_recommendation=route == "/api/analyze")
         except (ValueError, TypeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return
         if route == "/api/analyze":
-            result["providers"] = analyze_with_providers(choices, result)
+            result["providers"] = analyze_with_providers(choices, result, language)
         self._json(200, result)
 
 

@@ -59,3 +59,18 @@ NVIDIA NIM (`NVIDIA_MODEL`, по умолчанию `mistralai/mistral-nemotron`
 ## Ограничения и развитие
 
 Цены, эффекты и районные показатели намеренно вымышлены. Для применения к реальному планированию понадобятся проверенные данные, калибровка влияний, неопределённость прогноза и участие профильных экспертов. Командные сценарии сейчас сохраняются в одном браузере; общий рейтинг потребует серверного хранилища и идентификации команд.
+
+### District dataset and languages
+
+The district profiles use the five districts, population shares and ten baseline
+indicators in `Датасет районов.pdf`: Yesil, Almaty, Saryarka, Baikonur and Nura.
+Category scores use the PDF's indicator weights. Population values in the Python
+data are normalized weights, not census counts; the interface displays shares.
+The existing simulator budget, action catalog, spillover model and scoring formula
+remain in use, so its final scenario Score differs from the PDF's separate rules.
+
+The top-right language button cycles through Russian, English and Kazakh. The
+choice persists in this browser. Interface copy is in `static/i18n.js`; local
+analysis is translated from calculated results, and optional provider analysis is
+requested in the selected language. After switching languages, run analysis again
+to obtain a fresh provider narrative in that language.
