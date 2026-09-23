@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from ai import analyze_with_providers
-from data import ACTIONS, BUDGET, CATEGORIES, DISTRICTS
+from data import ACTIONS, BUDGET, CATEGORIES, DISTRICTS, INDICATORS, HORIZON, SYNERGIES, CONFLICTS, PRESETS, DATASET_VERSION
 from engine import simulate, validate_choices
 
 ROOT = Path(__file__).resolve().parent
@@ -28,8 +28,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         route = self.path.split("?", 1)[0]
         if route == "/api/bootstrap":
-            baseline = simulate({})
-            self._json(200, {"budget": BUDGET, "categories": CATEGORIES, "districts": DISTRICTS, "actions": ACTIONS, "baseline": baseline})
+            baseline = simulate([])
+            self._json(200, {"budget": BUDGET, "categories": CATEGORIES, "districts": DISTRICTS, "actions": ACTIONS, "indicators": INDICATORS, "horizon": HORIZON, "synergies": SYNERGIES, "conflicts": CONFLICTS, "presets": PRESETS, "version": DATASET_VERSION, "baseline": baseline})
             return
         files = {"/": "index.html", "/app.js": "app.js", "/style.css": "style.css"}
         if route not in files:
@@ -42,6 +42,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cache-Control", "no-cache")
         self.end_headers()
         self.wfile.write(body)
 
@@ -56,9 +57,9 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("Неверный размер запроса.")
             request = json.loads(self.rfile.read(length))
             if not isinstance(request, dict) or set(request) != {"choices"}:
-                raise ValueError("Ожидаются только решения сценария.")
+                raise ValueError("Ожидается список решений choices.")
             choices = validate_choices(request["choices"], complete=route == "/api/analyze")
-            result = simulate(choices, with_recommendation=route == "/api/analyze")
+            result = simulate(choices, with_recommendation=True)
         except (ValueError, TypeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return

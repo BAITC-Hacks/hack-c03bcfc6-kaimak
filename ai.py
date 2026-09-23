@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from data import ACTIONS, CATEGORIES, DISTRICTS
+from data import ACTIONS, CATEGORIES, DISTRICTS, INDICATORS
 
 ROOT = Path(__file__).resolve().parent
 OPENAI_URL = "https://api.openai.com/v1/responses"
@@ -72,21 +72,22 @@ def _facts(choices, result):
     actions = {item["id"]: item for item in ACTIONS}
     districts = {item["id"]: item for item in DISTRICTS}
     categories = {item["id"]: item for item in CATEGORIES}
+    indicators = {item["id"]: item for item in INDICATORS}
     return {
-        "context": "Synthetic training simulator; figures are model outputs, not real forecasts.",
-        "budget_million_tenge": {"total": result["budget"], "spent": result["spent"], "remaining": result["remaining"]},
+        "context": "Supplied HackAlem teaching dataset, not a real forecast. All indicators: higher is better. Budget units are conventional, NOT tenge. Horizon is 8 quarters. LLM must not calculate numbers.",
+        "budget": {"total": result["budget"], "spent": result["spent"], "remaining": result["remaining"]},
         "quality_of_life_score": {"before": result["baseline_score"], "after": result["score"], "change": result["gain"]},
+        "formula": result["formula"],
         "decisions": [
-            {
-                "direction": categories[category_id]["name"],
-                "action": actions[choice["action"]]["name"],
-                "district": districts[choice["district"]]["name"],
-                "cost_million_tenge": actions[choice["action"]]["cost"],
-            }
-            for category_id, choice in choices.items()
+            {"direction": categories[actions[c["action"]]["category"]]["name"],
+             "action": actions[c["action"]]["name"],
+             "district": districts[c["district"]]["name"] if "district" in c else "Весь город",
+             "cost": actions[c["action"]]["cost"]} for c in choices
         ],
-        "city_indicators": {categories[key]["name"]: value for key, value in result["city"].items()},
-        "district_scores": [{"name": item["name"], "before": item["before"], "after": item["after"]} for item in result["districts"]],
+        "city_indicators": {indicators[k]["name"]: v for k, v in result["city"].items()},
+        "districts": result["districts"],
+        "realized_measure_effects_before_clipping": result["contributions"],
+        "synergies": result["synergies"], "critical_indicators": result["critical"],
         "verified_analysis": result["analysis"],
         "verified_recommendation": result["recommendation"],
     }

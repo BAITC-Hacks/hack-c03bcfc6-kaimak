@@ -1,88 +1,53 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#091924">
-  <meta name="description" content="Аким на 5 часов — симулятор решений для города с общим бюджетом и прозрачным Astana Quality of Life Score.">
-  <title>Аким на 5 часов · Astana City Lab</title>
-  <link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d22">
+  <meta name="description" content="Городская лаборатория HackAlem: пять решений для Астаны по единому датасету районов.">
+  <title>QALA LAB — Аким на 5 часов</title>
+  <link rel="stylesheet" href="/style.css?v=3"><script src="/app.js?v=3" defer></script>
 </head>
 <body>
-  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-  <header class="site-header shell">
-    <a class="brand" href="#top" aria-label="Наверх">
-      <span class="brand-mark"><span></span><span></span><span></span><span></span></span>
-      <span><strong>QALA<span class="brand-dot">.</span>LAB</strong><small>ASTANA CITY SIMULATOR</small></span>
-    </a>
-    <nav class="header-nav" aria-label="Главное меню">
-      <a href="#workspace">Симулятор</a><a href="#districts-section">Районы</a><a href="#teams-section">Команды</a>
-    </nav>
-    <span class="header-badge"><span class="live-dot"></span> HACKALEM AI / TASK 01</span>
-  </header>
+<header class="site-header shell">
+  <a class="brand" href="#top" aria-label="Qala Lab, наверх"><span class="brand-mark">қ</span><span>QALA<span class="mint">.</span>LAB<small>СИМУЛЯТОР УПРАВЛЕНИЯ ГОРОДОМ</small></span></a>
+  <nav aria-label="Навигация"><a href="#workspace">Решения</a><a href="#atlas">Районы</a><a href="#teams">Сценарии</a></nav>
+  <span class="edition"><i></i> HACKALEM / 01</span>
+</header>
+<main id="top" class="shell">
+  <section class="app-intro">
+    <div><p class="eyebrow">HACKALEM AI / СИМУЛЯТОР</p><h1>Аким на 5 часов</h1><p>Соберите план из пяти мер и сравните его влияние на районы Астаны.</p></div>
+    <div class="intro-facts"><span><b>100</b> бюджет, усл. ед.</span><span><b>5</b> районов</span><span><b>8</b> кварталов</span></div>
+  </section>
+  <section id="workspace" class="section">
+    <div class="section-heading"><div><p class="eyebrow">01 / ПЛАН МЕРОПРИЯТИЙ</p><h2>Выберите мероприятия</h2></div><p class="section-note">Выберите ровно 5 мер.<br>Не более 2 из одного направления.<br>Районные и городские меры можно сочетать.</p></div>
+    <button class="button outline example-shortcut" id="example-button">Загрузить пример из датасета</button>
+    <div id="presets" class="presets" aria-label="Стартовые сценарии"></div>
+    <div class="workspace-grid">
+      <div class="catalog"><div id="load-status" class="load-status" role="status"><p id="load-status-text">Загружаем каталог мероприятий…</p><button id="retry-button" class="button outline" hidden>Повторить загрузку</button></div><div class="catalog-toolbar"><div id="category-nav" class="category-nav" aria-label="Направления"></div><div class="target-picker"><label for="target-district">Район для новых мер</label><select id="target-district"></select></div></div><div class="briefing" id="district-briefing"></div><div id="action-list" class="action-list"></div><p class="catalog-foot">Эффекты на карточках уже учитывают лаг: полный эффект × (8 − лаг) / 8. Городские меры применяются к каждому району.</p></div>
+      <aside class="dashboard">
+        <div class="budget-panel panel"><div class="panel-top"><span>ВАШ ПЛАН</span><button id="reset-button" class="text-button">Сбросить ↺</button></div><div class="budget-number"><strong id="remaining-value">100</strong><span>усл. ед.<br>осталось</span></div><div id="budget-segments" class="budget-segments"></div><div class="budget-meta"><span id="spent-value">0 / 100 использовано</span><span>Резерв без бонуса</span></div><ol id="plan-list" class="plan-list"></ol><div id="synergy-list" class="synergy-list"></div></div>
+        <div class="score-panel panel"><div class="panel-top"><span>ASTANA QUALITY OF LIFE</span><span id="score-mode" class="chip">ПРОГНОЗ</span></div><div class="score-number"><strong id="score-value">—</strong><span>/100</span></div><div class="score-change"><span id="score-delta"></span><span>База <b id="baseline-value">52.56</b></span></div><div id="formula-breakdown" class="formula-breakdown"></div><p id="completion-hint" class="muted"></p><button id="analyze-button" class="button primary full" disabled>AI-разбор стратегии <span>↗</span></button><p id="ai-progress" class="micro" aria-live="polite">Числа считает модель. ИИ объясняет решения.</p></div>
+      </aside>
+    </div>
+  </section>
 
-  <main id="top" class="shell">
-    <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="eyebrow-line"></span> ГОРОДСКАЯ ЛАБОРАТОРИЯ РЕШЕНИЙ</div>
-        <h1>Аким на <em>5 часов</em><span class="title-period">.</span></h1>
-        <p class="hero-lead">Пять решений. Один бюджет. Посмотрите, как ваш сценарий меняет качество жизни условного города.</p>
-        <div class="hero-actions"><a class="primary-button" href="#workspace">Начать симуляцию <span aria-hidden="true">↗</span></a><button class="text-button" id="example-button" type="button">Загрузить пример <span aria-hidden="true">→</span></button></div>
-        <p class="hero-note"><span class="small-spark">✦</span> Синтетические данные · Все команды начинают с одинаковых условий</p>
-      </div>
-      <div class="hero-orbit" aria-hidden="true">
-        <div class="orbit-ring orbit-ring-outer"></div><div class="orbit-ring orbit-ring-inner"></div>
-        <div class="orbit-center"><span>ASTANA</span><strong>5<span>×</span></strong><small>РЕШЕНИЙ ДЛЯ ГОРОДА</small></div>
-        <span class="orbit-point point-a">01</span><span class="orbit-point point-b">02</span><span class="orbit-point point-c">03</span><span class="orbit-point point-d">04</span><span class="orbit-point point-e">05</span>
-      </div>
-    </section>
+  <section id="atlas" class="section">
+    <div class="section-heading"><div><p class="eyebrow">02 / ПОКАЗАТЕЛИ РАЙОНОВ</p><h2>Изменения по районам</h2></div><div class="view-toggle" aria-label="Период карты"><button data-view="after" class="active" aria-pressed="true">После решений</button><button data-view="before" aria-pressed="false">До решений</button></div></div>
+    <div class="atlas-grid"><div class="map-panel panel"><div class="panel-top"><span>СХЕМА РАЙОНОВ / ASTANA</span><span>↑ N</span></div><div id="city-map" class="city-map"></div><div class="map-legend"><span><i class="legend-critical"></i> Есть показатель &lt; 40</span><span><i></i> Выбранный район</span></div><p class="micro">Учебная схема. Границы и расположение условные.</p></div><article id="district-detail" class="district-detail panel"></article></div>
+    <div class="critical-strip" id="critical-strip" aria-live="polite"></div>
+  </section>
 
-    <section class="brief-strip" aria-label="Условия симуляции">
-      <div><span class="brief-icon">₸</span><p>ВИРТУАЛЬНЫЙ БЮДЖЕТ<strong id="brief-budget">1 000 млн ₸</strong></p></div>
-      <div><span class="brief-icon">▦</span><p>УСЛОВНЫХ РАЙОНА<strong>4 района</strong></p></div>
-      <div><span class="brief-icon">✳</span><p>НАПРАВЛЕНИЙ<strong>5 решений</strong></p></div>
-      <div><span class="brief-icon">◎</span><p>ЦЕЛЬ<strong>Выше качество жизни</strong></p></div>
-    </section>
+  <section id="result-section" class="section" hidden>
+    <div class="section-heading"><div><p class="eyebrow">03 / РЕЗУЛЬТАТ</p><h2>Результат сценария</h2></div><button id="export-button" class="button outline">Скачать паспорт ↗</button></div>
+    <div class="results-grid"><article class="panel result-main"><span class="eyebrow">РАСЧЁТ ПО ДАТАСЕТУ</span><h3 id="result-summary"></h3><div class="analysis-columns"><div><h4>Что удалось</h4><ul id="strength-list"></ul></div><div><h4>Что учесть</h4><ul id="risk-list"></ul></div></div><p id="consequence-text" class="consequence"></p><div id="provider-content" aria-live="polite"></div></article><article class="panel recommendation"><span class="eyebrow">РЕКОМЕНДАЦИЯ</span><span class="recommend-arrow">↗</span><h3>Вариант улучшения</h3><p id="recommend-text"></p><button id="apply-recommendation" class="button outline full" hidden>Применить замену →</button><p class="micro">Перебор допустимых замен одного решения. Это локальное улучшение, не глобальный максимум.</p></article></div>
+    <div class="save-strip panel"><div><h3>Сохранить сценарий</h3><p class="muted">Сохраните этот вариант и попробуйте другую стратегию.</p></div><form id="save-form"><label class="sr-only" for="team-name">Название сценария или команды</label><input id="team-name" maxlength="40" placeholder="Команда / название сценария" required><button class="button primary" type="submit">Сохранить +</button></form></div>
+  </section>
 
-    <section id="workspace" class="workspace-section">
-      <div class="section-heading"><div><span class="section-kicker">01 / ВАША СТРАТЕГИЯ</span><h2>Соберите свой сценарий</h2><p>Выберите по одному мероприятию в каждом направлении и укажите район.</p></div><div class="heading-controls"><button id="reset-button" class="reset-button" type="button">Сбросить ↺</button><span class="section-counter" id="decision-count">0 / 5 РЕШЕНИЙ</span></div></div>
-      <div class="workspace-grid">
-        <aside class="step-nav panel"><div class="panel-overline">НАПРАВЛЕНИЯ</div><div id="category-nav"></div><div class="step-nav-footer"><span>✳</span><p>Любое решение можно изменить до финального анализа.</p></div></aside>
-        <section class="decision-panel panel" aria-label="Выбор мероприятий"><div id="decision-content"></div></section>
-        <aside class="dashboard-column">
-          <div class="budget-card panel">
-            <div class="card-topline"><span>БЮДЖЕТ СЦЕНАРИЯ</span><span class="card-glyph">₸</span></div>
-            <div class="budget-amount"><strong id="remaining-value">1 000</strong><span>млн ₸<small>осталось</small></span></div>
-            <div class="budget-track"><span id="budget-fill"></span></div>
-            <div class="budget-meta"><span>Использовано <b id="spent-value">0 млн ₸</b></span><span id="budget-percent">0%</span></div>
-          </div>
-          <div class="score-card panel">
-            <div class="card-topline"><span>ASTANA QUALITY OF LIFE SCORE</span><span class="score-badge">LIVE</span></div>
-            <div class="score-number"><strong id="score-value">—</strong><span>/ 100</span></div>
-            <div class="score-change"><span id="score-delta">Ожидаем данные…</span><small id="baseline-value"></small></div>
-            <div id="metric-bars" class="metric-bars"></div>
-            <button id="analyze-button" type="button" class="primary-button analyze-button" disabled>Получить AI-разбор <span aria-hidden="true">↗</span></button>
-            <p id="analyze-hint" class="analyze-hint">Выберите все пять решений</p>
-          </div>
-        </aside>
-      </div>
-    </section>
+  <section id="teams" class="section"><div class="section-heading"><div><p class="eyebrow">04 / СРАВНЕНИЕ СТРАТЕГИЙ</p><h2>Сравнение сценариев</h2></div><span class="micro">Сохраняется в этом браузере</span></div><div id="teams-list" class="teams-list"></div></section>
 
-    <section id="result-section" class="result-section" hidden>
-      <div class="section-heading"><div><span class="section-kicker">02 / ИТОГ СЦЕНАРИЯ</span><h2>Что изменится в городе</h2><p>Расчёт основан на выбранных мероприятиях и синтетических показателях.</p></div><span class="result-stamp">АНАЛИЗ ГОТОВ</span></div>
-      <div class="result-grid">
-        <article class="result-main panel"><div class="result-top"><span class="panel-overline">АНАЛИТИЧЕСКИЙ ВЫВОД</span><span id="analysis-mode" class="mode-pill"></span></div><p id="result-summary" class="result-summary"></p><div id="openai-block" class="provider-block" hidden><span>OPENAI · СИНТЕЗ СЦЕНАРИЯ</span><p id="llm-narrative"></p></div><div id="nvidia-block" class="provider-block nvidia-block" hidden><span>NVIDIA NIM · ГИПОТЕЗА О РИСКАХ</span><p id="nvidia-review"></p></div><p id="provider-status" class="provider-status"></p><div class="analysis-columns"><div><h3><span class="green-symbol">✦</span> Сильные стороны</h3><ul id="strength-list"></ul></div><div><h3><span class="amber-symbol">◇</span> Риски и последствия</h3><ul id="risk-list"></ul></div></div><div class="consequence"><span>ГЛАВНЫЙ КОМПРОМИСС</span><p id="consequence-text"></p></div></article>
-        <article class="recommend-card panel"><span class="panel-overline">АГЕНТ РЕКОМЕНДАЦИЙ</span><div class="recommend-icon">↗</div><h3>Можно улучшить?</h3><p id="recommend-text"></p><button id="apply-recommendation" type="button" class="secondary-button" hidden>Применить рекомендацию →</button></article>
-      </div>
-      <div class="save-strip panel"><div><span class="panel-overline">СРАВНИТЬ С КОМАНДАМИ</span><h3>Сохраните сценарий</h3><p>Результаты хранятся в этом браузере.</p></div><div class="save-controls"><label class="visually-hidden" for="team-name">Название команды</label><input id="team-name" type="text" maxlength="40" placeholder="Название команды"><button id="save-team" class="secondary-button" type="button">Сохранить результат</button></div></div>
-    </section>
-
-    <section id="districts-section" class="district-section"><div class="section-heading"><div><span class="section-kicker">03 / КАРТА ДАННЫХ</span><h2>Районы города</h2><p>Показатели условные. Выберите район, чтобы увидеть его профиль.</p></div><span class="outline-tag">СИНТЕТИЧЕСКИЙ ДАТАСЕТ</span></div><div class="district-grid"><div class="district-map panel"><div class="map-header"><span class="panel-overline">ИНТЕРАКТИВНАЯ СХЕМА</span><span>↑ N</span></div><div id="map-tiles" class="map-tiles"></div><p>Схематичная карта, не соответствует реальной географии Астаны.</p></div><div class="district-detail panel" id="district-detail"></div></div></section>
-
-    <section id="teams-section" class="teams-section"><div class="section-heading"><div><span class="section-kicker">04 / СРАВНЕНИЕ</span><h2>Сценарии команд</h2><p>Сохранённые результаты доступны только в этом браузере.</p></div><span id="teams-count" class="section-counter">0 СЦЕНАРИЕВ</span></div><div id="teams-list" class="teams-list"></div></section>
-  </main>
-  <footer class="site-footer shell"><span>QALA.LAB © 2026</span><span>Аким на 5 часов · Учебный симулятор HackAlem AI</span><a href="#top">Наверх ↑</a></footer>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <section class="section methodology"><details><summary><span><span class="eyebrow">ОТКРЫТАЯ МЕТОДОЛОГИЯ</span><strong>Из чего складывается результат?</strong></span><span class="plus">+</span></summary><div class="method-content"><p>Источник: <b>task/Датасет районов.docx</b>. Учебные показатели, а не официальный прогноз. Для правил выбора мер используется подробный датасет: ровно 5 решений, максимум 2 из одного направления.</p><div class="formula-large">Score = 0.7 × D<sub>avg</sub> + 0.3 × D<sub>min</sub> − N<sub>crit</sub></div><p>D — сумма 10 показателей с весами из датасета. D<sub>avg</sub> учитывает доли населения, D<sub>min</sub> — слабейший район. N<sub>crit</sub> — число значений строго ниже 40. Показатели ограничиваются диапазоном 0–100 после суммирования всех эффектов и синергий. Промежуточные вычисления не округляются.</p><div id="source-table" class="table-scroll"></div><div class="method-rules"><div><h4>Синергии</h4><p>M1 + M2 → T1 +2<br>M10 + M12 → B1 +2<br>M5 + M6 → E2 +2</p><p class="micro">Фиксированный бонус в районе первой меры пары, без масштабирования лагом.</p></div><div><h4>Конфликты</h4><p>M1 / M3 — в любых районах.<br>M4 / M7 — в одном районе.<br>M5 / M13 — в одном районе.</p></div><div><h4>Роль AI</h4><p>NVIDIA ищет риски, OpenAI объясняет стратегию. Оба получают готовый расчёт. Ответы AI не изменяют Score.</p></div></div></div></details></section>
+</main>
+<footer class="shell"><a class="brand" href="#top">QALA.LAB ↗</a><span>Аким на 5 часов · HackAlem AI · 2026</span><span>Данные из задания HackAlem</span></footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><noscript>Для работы симулятора включите JavaScript.</noscript>
 </body>
 </html>
